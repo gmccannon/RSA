@@ -4,11 +4,12 @@ import pandas as pd
 import numpy as np
 import sys
 from random import randint
+from math import gcd
 
 
 # check if p is prime (most likely a prime)
 def FermatPrimalityTest(n):
-    print(n)
+    # print(n)
     a = randint(2, n - 2)
     
     # fremat test with 2 iterations
@@ -24,16 +25,51 @@ def FermatPrimalityTest(n):
     return True
 
 
-def RSA_key_generation():
-    p = randint(pow(2, 511), pow(2, 512))
-    q = randint(pow(2, 511), pow(2, 512))
+def gcdExtended(a, b): 
+    # Base Case 
+    if a == 0 : 
+        return b,0,1
+             
+    gcd,x1,y1 = gcdExtended(b%a, a) 
+     
+    # Update x and y using results of recursive 
+    # call 
+    x = y1 - (b//a) * x1 
+    y = x1 
+     
+    return gcd,x,y 
 
+
+def RSA_key_generation():
+    p = 10
+    q = 10
+    # generate a prime p
+    while not FermatPrimalityTest(p):
+        p = randint(pow(2, 511), pow(2, 512))
+    # generate a prime q
+    while not FermatPrimalityTest(q):
+        q = randint(pow(2, 511), pow(2, 512))   
+    # write p and q
     pq = pd.Series([p,q])
-    # en = pd.Series([e,n])
-    # dn = pd.Series([d,n])
+    
+    # public key
+    e = 65537
+    n = p*q
+
+    gcd, d, i = gcdExtended(e, (p-1)*(q-1))
+    if d < 0:
+        d = d + (p -1)*(q -1)
+
+    print(f"d = {d}")
+    print(f"n = {p*q}")
+    print( f"e*d = {(e*d) % ((p-1)*(q-1))}" )
+    
+
+    en = pd.Series([e,n])
+    dn = pd.Series([d,n])
     pq.to_csv("p_q.csv")
-    # en.to_csv("e_n.csv")
-    # dn.to_csv("d_n.csv")
+    en.to_csv("e_n.csv")
+    dn.to_csv("d_n.csv")
     print("done with key generation!")
 
 
