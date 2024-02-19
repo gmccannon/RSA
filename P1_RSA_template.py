@@ -67,10 +67,6 @@ def RSA_key_generation():
     if d < 0:
         d = d + phi_n
 
-    print(f"d = {d}")
-    print(f"n = {p*q}")
-    print( f"e*d = {(e*d) % ((p-1)*(q-1))}" )
-
     pq = pd.Series([p,q])
     en = pd.Series([e,n])
     dn = pd.Series([d,n])
@@ -89,7 +85,6 @@ def Signing(doc, key):
 
 
 def verification(doc, key):
-
     match = False
     # to be completed
     if match:
