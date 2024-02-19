@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import sys
 from random import randint
-#from math import pow
 
 
 # check if p is prime (most likely a prime)
@@ -12,12 +11,13 @@ def FermatPrimalityTest(n):
     print(n)
     a = randint(2, n - 2)
     
+    # fremat test with 2 iterations
     for i in range(a, a + 2):
         # make sure that n is not co-prime of a
         if gcd(i, n) != 1:
             return False
 
-        # fermat test
+        # actual fermat test
         if (pow(i, n -1, n)) != 1:
             return False
     
@@ -25,18 +25,15 @@ def FermatPrimalityTest(n):
 
 
 def RSA_key_generation():
-    p = 7
-    q = 13
-    n = p*q
-    e = 3
-    d = 5
-    # to be completed
+    p = randint(pow(2, 511), pow(2, 512))
+    q = randint(pow(2, 511), pow(2, 512))
+
     pq = pd.Series([p,q])
-    en = pd.Series([e,n])
-    dn = pd.Series([d,n])
+    # en = pd.Series([e,n])
+    # dn = pd.Series([d,n])
     pq.to_csv("p_q.csv")
-    en.to_csv("e_n.csv")
-    dn.to_csv("d_n.csv")
+    # en.to_csv("e_n.csv")
+    # dn.to_csv("d_n.csv")
     print("done with key generation!")
 
 
