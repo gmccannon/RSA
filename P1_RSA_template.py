@@ -7,10 +7,10 @@ from random import randint
 from math import gcd
 
 
-# check if p is prime (most likely a prime)
+# check if n is prime (most likely a prime)
 def FermatPrimalityTest(n):
     # print(n)
-    a = randint(2, n - 2)
+    a = randint(2, n - 3)
     
     # fremat test with 2 iterations
     for i in range(a, a + 2):
@@ -25,6 +25,14 @@ def FermatPrimalityTest(n):
     return True
 
 
+def test(mess, e, d, n):
+    cypher = pow(mess, e, n)
+    print(cypher)
+
+    decMess = pow(cypher, d, n)
+    print(decMess)
+
+
 def gcdExtended(a, b): 
     # Base Case 
     if a == 0 : 
@@ -32,8 +40,7 @@ def gcdExtended(a, b):
              
     gcd,x1,y1 = gcdExtended(b%a, a) 
      
-    # Update x and y using results of recursive 
-    # call 
+    # Update x and y  
     x = y1 - (b//a) * x1 
     y = x1 
      
@@ -50,27 +57,29 @@ def RSA_key_generation():
     while not FermatPrimalityTest(q):
         q = randint(pow(2, 511), pow(2, 512))   
     # write p and q
-    pq = pd.Series([p,q])
     
     # public key
     e = 65537
     n = p*q
+    phi_n = (p - 1)*(q - 1)
 
-    gcd, d, i = gcdExtended(e, (p-1)*(q-1))
+    gcd, d, i = gcdExtended(e, phi_n)
     if d < 0:
-        d = d + (p -1)*(q -1)
+        d = d + phi_n
 
     print(f"d = {d}")
     print(f"n = {p*q}")
     print( f"e*d = {(e*d) % ((p-1)*(q-1))}" )
-    
 
+    pq = pd.Series([p,q])
     en = pd.Series([e,n])
     dn = pd.Series([d,n])
     pq.to_csv("p_q.csv")
     en.to_csv("e_n.csv")
     dn.to_csv("d_n.csv")
     print("done with key generation!")
+
+    test(901050306030300306020, e, d, n)
 
 
 def Signing(doc, key):
