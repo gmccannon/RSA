@@ -30,7 +30,8 @@ def gcdExtended(a, b):
     # Base Case 
     if a == 0 : 
         return b,0,1
-             
+    
+    # recursive call
     gcd,x1,y1 = gcdExtended(b%a, a) 
      
     # Update x and y  
@@ -41,32 +42,41 @@ def gcdExtended(a, b):
 
 
 def RSA_key_generation():
+    # Initialize primes p and q to small values for start
     p = 10
     q = 10
-    # generate a prime p
+    
+    # Generate a prime p
     while not FermatPrimalityTest(p):
         p = randint(pow(2, 511), pow(2, 512))
-    # generate a prime q
+    
+    # Generate a prime q
     while not FermatPrimalityTest(q):
         q = randint(pow(2, 511), pow(2, 512))   
-    # write p and q
     
-    # public key
+    # Public key
     e = 65537
-    n = p*q
-    phi_n = (p - 1)*(q - 1)
 
+    # Calculate n and Euler's totient function (phi_n)
+    n = p * q
+    phi_n = (p - 1) * (q - 1)
+
+    # Calculate the modular multiplicative inverse of e (private key)
     gcd, d, i = gcdExtended(e, phi_n)
+    
+    # If d is negative, convert it to a positive value
     if d < 0:
         d = d + phi_n
 
-    pq = pd.Series([p,q])
-    en = pd.Series([e,n])
-    dn = pd.Series([d,n])
+    # Save the generated keys to CSV files
+    pq = pd.Series([p, q])
+    en = pd.Series([e, n])
+    dn = pd.Series([d, n])
     pq.to_csv("p_q.csv")
     en.to_csv("e_n.csv")
     dn.to_csv("d_n.csv")
-    print("done with key generation!")
+    
+    print("Done with key generation!")
 
 
 def Signing(doc, key):
@@ -108,7 +118,7 @@ def verification(doc, key):
         content_lines = lines
         signature = lines[-1]       # The last line
 
-    # Concatenate the lines to form the content
+    # Concatenate the lines except the last (signature) to form the content
     content = ''.join(content_lines)
     content = content.rsplit('\n', 1)
     content = content[0]
