@@ -57,14 +57,14 @@ def RSA_key_generation():
     # Public key
     e = 65537
 
-    # Calculate n and Euler's totient function (phi_n)
+    # Calculate n and phi_n
     n = p * q
     phi_n = (p - 1) * (q - 1)
 
     # Calculate the modular multiplicative inverse of e (private key)
     gcd, d, i = gcdExtended(e, phi_n)
     
-    # If d is negative, convert it to a positive value
+    # If d is negative, convert it to a positive value by adding phi n
     if d < 0:
         d = d + phi_n
 
