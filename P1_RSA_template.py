@@ -5,6 +5,7 @@ import numpy as np
 import sys
 from random import randint
 from math import gcd
+import hashlib
 
 
 # check if n is prime (most likely a prime)
@@ -23,14 +24,6 @@ def FermatPrimalityTest(n):
             return False
     
     return True
-
-
-def test(mess, e, d, n):
-    cypher = pow(mess, e, n)
-    print(cypher)
-
-    decMess = pow(cypher, d, n)
-    print(decMess)
 
 
 def gcdExtended(a, b): 
@@ -75,19 +68,61 @@ def RSA_key_generation():
     dn.to_csv("d_n.csv")
     print("done with key generation!")
 
-    test(901050306030300306020, e, d, n)
-
 
 def Signing(doc, key):
-    match = False
-    # to be completed
+
+    # generate the hash based on the file contents 
+    with open(doc, "r") as file:
+        lines = file.readlines()
+        content_lines = lines  # All but the last line
+
+    # Concatenate the lines to form the content
+    content = ''.join(content_lines)
+
+    # Generate the SHA-256 hash based on the content
+    hash_object = hashlib.sha256(content.encode())
+    h = hash_object.hexdigest()   
+   
+    # sign the hash, then cast the hash as a hex value
+    n = int(pd.read_csv('p_q.csv').iloc[1, 0]) * int(pd.read_csv('p_q.csv').iloc[1, 1]) # n = p*q 
+    signature = pow(int(h, 16), int(key), n)
+    signature = hex(signature)
+
+    # copy the contents of the file to the signed file, then add the signature to the signed file
+    with open(doc, 'r') as file:
+        with open('file.txt.signed', 'w') as signed_file:
+            for line in file:
+                signed_file.write(line)
+
+            signed_file.write("\n")
+            signed_file.write(str(signature))
+
     print("\nSigned ...")
 
 
 def verification(doc, key):
-    match = False
-    # to be completed
-    if match:
+    # get the signature
+    # Read the file and separate the last line
+    with open(doc, "r") as file:
+        lines = file.readlines()
+        content_lines = lines
+        signature = lines[-1]       # The last line
+
+    # Concatenate the lines to form the content
+    content = ''.join(content_lines)
+    content = content.rsplit('\n', 1)
+    content = content[0]
+
+    # Generate the SHA-256 hash based on the content
+    hash_object = hashlib.sha256(content.encode())
+    h = hash_object.hexdigest()
+   
+    # sign the hash, then cast the hash as a hex value
+    n = int(pd.read_csv('p_q.csv').iloc[1, 0]) * int(pd.read_csv('p_q.csv').iloc[1, 1]) # n = p*q 
+    new_sign = int(pow(int(h, 16), int(key), n))
+    new_sign = hex(new_sign)
+
+    if signature == new_sign:
         print("\nAuthentic!")
     else:
         print("\nModified!")
@@ -103,13 +138,13 @@ def main():
     else:
         (task, fileName) = sys.argv[2:]
         if "s" in task:  # do signing
-            doc = None  # you figure out
-            key = None  # you figure out
+            doc = fileName
+            key = pd.read_csv('d_n.csv').iloc[1, 1]
             Signing(doc, key)
         else:
             # do verification
-            doc = None   # you figure out
-            key = None   # you figure out
+            doc = fileName
+            key = pd.read_csv('e_n.csv').iloc[1, 1]
             verification(doc, key)
 
     print("done!")
