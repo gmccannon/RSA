@@ -84,10 +84,9 @@ def Signing(doc, key):
     # generate the hash based on the file contents 
     with open(doc, "r") as file:
         lines = file.readlines()
-        content_lines = lines  # All but the last line
 
     # Concatenate the lines to form the content
-    content = ''.join(content_lines)
+    content = ''.join(lines)
 
     # Generate the SHA-256 hash based on the content
     hash_object = hashlib.sha256(content.encode())
